@@ -13,9 +13,16 @@ import { WebhookModule } from '../webhook/webhook.module';
       inject: [ConfigService],
       useFactory: (cs: ConfigService) => ({
         connection: {
-          host: cs.get<string>('REDIS_HOST') ?? 'localhost',
-          port: cs.get<number>('REDIS_PORT') ?? 6379,
-          password: cs.get<string>('REDIS_PASSWORD') || undefined,
+          host:
+            cs.get<string>('REDIS_HOST') ??
+            cs.get<string>('REDISHOST') ??
+            'localhost',
+          port:
+            cs.get<number>('REDIS_PORT') ?? cs.get<number>('REDISPORT') ?? 6379,
+          password:
+            (cs.get<string>('REDIS_PASSWORD') ??
+              cs.get<string>('REDISPASSWORD')) ||
+            undefined,
         },
       }),
     }),

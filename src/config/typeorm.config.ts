@@ -9,11 +9,12 @@ dotenv.config();
 
 const dataSourceOptions: DataSourceOptions = {
   type: 'mysql',
-  host: process.env.DB_HOST ?? 'localhost',
-  port: parseInt(process.env.DB_PORT ?? '3306', 10),
-  username: process.env.DB_USERNAME ?? 'gemogi',
-  password: process.env.DB_PASSWORD ?? 'gemogi_password',
-  database: process.env.DB_DATABASE ?? 'gemogi_db',
+  host: process.env.DB_HOST ?? process.env.MYSQLHOST ?? 'localhost',
+  port: parseInt(process.env.DB_PORT ?? process.env.MYSQLPORT ?? '3306', 10),
+  username: process.env.DB_USERNAME ?? process.env.MYSQLUSER ?? 'gemogi',
+  password:
+    process.env.DB_PASSWORD ?? process.env.MYSQLPASSWORD ?? 'gemogi_password',
+  database: process.env.DB_DATABASE ?? process.env.MYSQLDATABASE ?? 'gemogi_db',
   entities: [User, Product, Order, WebhookLog],
   migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
   synchronize: true,
