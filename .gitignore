@@ -18,4 +18,10 @@ lerna-debug.log*
 .vscode/
 *.sublime-workspace
 
-.env*
+# Environment variables
+.env
+.env.prod
+.env.local
+.env.production
+.env.development
+.env.staging
