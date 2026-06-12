@@ -54,6 +54,6 @@ import { WebhookModule } from '../webhook/webhook.module';
     WebhookModule,
   ],
   providers: [OrderProducer, OrderProcessor],
-  exports: [OrderProducer],
+  exports: [OrderProducer, BullModule],
 })
 export class QueueModule {}
