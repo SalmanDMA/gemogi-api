@@ -9,7 +9,18 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiParam,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { QueryProductDto } from './dto/query-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -27,8 +38,14 @@ export class ProductsController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new product (Admin only)' })
+  @ApiCreatedResponse({ description: 'Product successfully created.' })
+  @ApiBadRequestResponse({
+    description: 'Validation failed or invalid input data.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized access token.' })
+  @ApiForbiddenResponse({ description: 'Forbidden. Admin role required.' })
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
@@ -36,8 +53,14 @@ export class ProductsController {
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a product (Admin only)' })
+  @ApiParam({ name: 'id', description: 'Product UUID', format: 'uuid' })
+  @ApiOkResponse({ description: 'Product successfully updated.' })
+  @ApiBadRequestResponse({ description: 'Validation failed or invalid UUID.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized access token.' })
+  @ApiForbiddenResponse({ description: 'Forbidden. Admin role required.' })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -51,6 +74,9 @@ export class ProductsController {
     summary:
       'Get paginated product list with optional search & category filter',
   })
+  @ApiOkResponse({
+    description: 'Paginated product list retrieved successfully.',
+  })
   findAll(@Query() query: QueryProductDto) {
     return this.productsService.findAll(query);
   }
@@ -58,6 +84,10 @@ export class ProductsController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get product detail by ID' })
+  @ApiParam({ name: 'id', description: 'Product UUID', format: 'uuid' })
+  @ApiOkResponse({ description: 'Product detail retrieved successfully.' })
+  @ApiBadRequestResponse({ description: 'Invalid UUID format.' })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.findOne(id);
   }
@@ -65,6 +95,7 @@ export class ProductsController {
   @Public()
   @Post('contact')
   @ApiOperation({ summary: 'Submit a contact form message' })
+  @ApiOkResponse({ description: 'Contact form message received successfully.' })
   submitContact() {
     return {
       success: true,
