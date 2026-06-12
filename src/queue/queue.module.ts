@@ -11,20 +11,41 @@ import { WebhookModule } from '../webhook/webhook.module';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (cs: ConfigService) => ({
-        connection: {
-          host:
-            cs.get<string>('REDIS_HOST') ??
-            cs.get<string>('REDISHOST') ??
-            'localhost',
-          port:
-            cs.get<number>('REDIS_PORT') ?? cs.get<number>('REDISPORT') ?? 6379,
-          password:
-            (cs.get<string>('REDIS_PASSWORD') ??
-              cs.get<string>('REDISPASSWORD')) ||
-            undefined,
-        },
-      }),
+      useFactory: (cs: ConfigService) => {
+        const url =
+          cs.get<string>('REDIS_URL') ?? cs.get<string>('REDIS_PUBLIC_URL');
+        if (url) {
+          try {
+            const parsed = new URL(url);
+            return {
+              connection: {
+                host: parsed.hostname,
+                port: parseInt(parsed.port || '6379', 10),
+                password: parsed.password || undefined,
+                username: parsed.username || undefined,
+              },
+            };
+          } catch {
+            // fallback if URL is invalid
+          }
+        }
+        return {
+          connection: {
+            host:
+              cs.get<string>('REDIS_HOST') ??
+              cs.get<string>('REDISHOST') ??
+              'localhost',
+            port:
+              cs.get<number>('REDIS_PORT') ??
+              cs.get<number>('REDISPORT') ??
+              6379,
+            password:
+              (cs.get<string>('REDIS_PASSWORD') ??
+                cs.get<string>('REDISPASSWORD')) ||
+              undefined,
+          },
+        };
+      },
     }),
     BullModule.registerQueue({
       name: 'order-processing',

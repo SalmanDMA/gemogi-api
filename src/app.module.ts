@@ -30,29 +30,45 @@ import { TransformResponseInterceptor } from './common/interceptors/transform-re
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (cs: ConfigService) => ({
-        type: 'mysql',
-        host:
-          cs.get<string>('DB_HOST') ??
-          cs.get<string>('MYSQLHOST') ??
-          'localhost',
-        port: cs.get<number>('DB_PORT') ?? cs.get<number>('MYSQLPORT') ?? 3306,
-        username:
-          cs.get<string>('DB_USERNAME') ??
-          cs.get<string>('MYSQLUSER') ??
-          'gemogi',
-        password:
-          cs.get<string>('DB_PASSWORD') ??
-          cs.get<string>('MYSQLPASSWORD') ??
-          'gemogi_password',
-        database:
-          cs.get<string>('DB_DATABASE') ??
-          cs.get<string>('MYSQLDATABASE') ??
-          'gemogi_db',
-        entities: [User, Product, Order, WebhookLog],
-        synchronize: true,
-        autoLoadEntities: true,
-      }),
+      useFactory: (cs: ConfigService) => {
+        const url =
+          cs.get<string>('DATABASE_URL') ??
+          cs.get<string>('MYSQL_URL') ??
+          cs.get<string>('MYSQL_PUBLIC_URL');
+        if (url) {
+          return {
+            type: 'mysql',
+            url,
+            entities: [User, Product, Order, WebhookLog],
+            synchronize: true,
+            autoLoadEntities: true,
+          };
+        }
+        return {
+          type: 'mysql',
+          host:
+            cs.get<string>('DB_HOST') ??
+            cs.get<string>('MYSQLHOST') ??
+            'localhost',
+          port:
+            cs.get<number>('DB_PORT') ?? cs.get<number>('MYSQLPORT') ?? 3306,
+          username:
+            cs.get<string>('DB_USERNAME') ??
+            cs.get<string>('MYSQLUSER') ??
+            'gemogi',
+          password:
+            cs.get<string>('DB_PASSWORD') ??
+            cs.get<string>('MYSQLPASSWORD') ??
+            'gemogi_password',
+          database:
+            cs.get<string>('DB_DATABASE') ??
+            cs.get<string>('MYSQLDATABASE') ??
+            'gemogi_db',
+          entities: [User, Product, Order, WebhookLog],
+          synchronize: true,
+          autoLoadEntities: true,
+        };
+      },
     }),
     TerminusModule,
     AuthModule,

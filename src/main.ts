@@ -6,6 +6,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   console.log('--- DATABASE CONNECTION DEBUG ---');
   console.log(
+    `DATABASE_URL_DETECTED: ${!!(process.env.DATABASE_URL ?? process.env.MYSQL_URL ?? process.env.MYSQL_PUBLIC_URL)}`,
+  );
+  console.log(
     `DB_HOST: ${JSON.stringify(process.env.DB_HOST ?? process.env.MYSQLHOST ?? 'localhost')}`,
   );
   console.log(
@@ -23,6 +26,9 @@ async function bootstrap() {
   console.log('---------------------------------');
 
   console.log('--- REDIS CONNECTION DEBUG ---');
+  console.log(
+    `REDIS_URL_DETECTED: ${!!(process.env.REDIS_URL ?? process.env.REDIS_PUBLIC_URL)}`,
+  );
   console.log(
     `REDIS_HOST: ${JSON.stringify(process.env.REDIS_HOST ?? process.env.REDISHOST ?? 'localhost')}`,
   );
